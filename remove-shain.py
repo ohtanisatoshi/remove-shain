@@ -1,7 +1,7 @@
 # -*- coding: utf8 -*-
 from PIL import Image
 
-BLACK_THRESHOLD = 60
+BLACK_THRESHOLD = 100
 
 def is_red(r, g, b):
     r_g = r - g
@@ -15,7 +15,7 @@ def is_red(r, g, b):
         return False
 
 
-img = Image.open("Jobwise.jpg")
+img = Image.open("JCSreceipt.jpg")
 img_new = img.copy()
 img_gray_data = img.convert('L').getdata()
 #img_gray.show()
@@ -38,7 +38,7 @@ while(is_changed):
                 p_l_r, p_l_g, p_l_b = img_data[(x-1) + y*w]
                 p_r_r, p_r_g, p_r_b = img_data[(x+1) + y*w]
                 p_a_r, p_a_g, p_a_b = img_data[(x) + (y-1)*w]
-                p_b_r, p_b_g, p_b_b = img_data[(x)*w  + (y+1)*w]
+                p_b_r, p_b_g, p_b_b = img_data[(x)  + (y+1)*w]
                 # 1: white, 2: red, 3: black
                 gray_l = 0
                 c_l = 1
