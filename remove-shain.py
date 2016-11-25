@@ -1,6 +1,7 @@
+# -*- coding: utf8 -*-
 from PIL import Image
 
-BLACK_THRESHOLD = 130
+BLACK_THRESHOLD = 80
 
 def is_red(r, g, b):
     r_g = r - g
@@ -14,8 +15,8 @@ def is_red(r, g, b):
         return False
 
 
-img = Image.open("seikyuusho.jpg")
-img_rgb = img.convert('RGB')
+img = Image.open("Jobwise.jpg")
+img_new = img.copy()
 img_gray = img.convert('L')
 #img_gray.show()
 
@@ -25,12 +26,15 @@ h = img.size[1]
 is_changed = True
 while(is_changed):
     is_changed = False
+    img_rgb = img_new.copy()
     for wy in range(h-2):
         y = wy + 1
         for wx in range(w-2):
             x = wx + 1
             r, g, b = img_rgb.getpixel((x, y))
             if is_red(r, g, b):
+                is_changed = True
+
                 p_l_r, p_l_g, p_l_b = img_rgb.getpixel((x-1, y))
                 p_r_r, p_r_g, p_r_b = img_rgb.getpixel((x+1, y))
                 p_a_r, p_a_g, p_a_b = img_rgb.getpixel((x, y-1))
@@ -68,80 +72,65 @@ while(is_changed):
                     gray_b = img_gray.getpixel((x, y+1))
                     if gray_b < BLACK_THRESHOLD:
                         c_b = 3
+                # 周りにひとつでも黒があれば中心を黒に変換
                 if c_l == 3 or c_r == 3 or c_a == 3 or c_b == 3:
-                    r_total = 0
-                    g_total = 0
-                    b_total = 0
-                    gray_p_count = 0
-                    if c_l == 3:
-                        gray_p_count += 1
-                        r_total += p_l_r
-                        g_total += p_l_g
-                        b_total += p_l_b
-                    if c_r == 3:
-                        gray_p_count += 1
-                        r_total += p_r_r
-                        g_total += p_r_g
-                        b_total += p_r_b
-                    if c_a == 3:
-                        gray_p_count += 1
-                        r_total += p_a_r
-                        g_total += p_a_g
-                        b_total += p_a_b
-                    if c_b == 3:
-                        gray_p_count += 1
-                        r_total += p_b_r
-                        g_total += p_b_g
-                        b_total += p_b_b
-
-                    r_new_value = r_total/gray_p_count
-                    g_new_value = g_total/gray_p_count
-                    b_new_value = b_total/gray_p_count
-                    if is_red(r_new_value, g_new_value, b_new_value):
-                        if g_new_value < b_new_value:
-                            r_new_value = g_new_value
-                        else:
-                            r_new_value = b_new_value
-
                     r_max = 0
                     g_max = 0
                     b_max = 0
                     gray_max = 0
+                    black_p_count = 0
+                    black_p_total_value = 0
                     if c_l == 3:
+                        black_p_total_value += gray_l
+                        black_p_count += 1
                         if gray_l < gray_max:
+                            gray_max = gray_l
                             r_max = p_l_r
                             g_max = p_l_g
                             b_max = p_l_b
                     if c_r == 3:
+                        black_p_total_value += gray_r
+                        black_p_count += 1
                         if gray_r < gray_max:
+                            gray_max = gray_r
                             r_max = p_r_r
                             g_max = p_r_g
                             b_max = p_r_b
                     if c_a == 3:
+                        black_p_total_value += gray_a
+                        black_p_count += 1
                         if gray_a < gray_max:
+                            gray_max = gray_a
                             r_max = p_a_r
                             g_max = p_a_g
                             b_max = p_a_b
                     if c_b == 3:
+                        black_p_total_value += gray_b
+                        black_p_count += 1
                         if gray_b < gray_max:
+                            gray_max = gray_b
                             r_max = p_b_r
                             g_max = p_b_g
                             b_max = p_b_b
 
-                    #img_rgb.putpixel((x, y), (r_new_value, g_new_value, b_new_value))
-                    img_rgb.putpixel((x, y), (r_max, g_max, b_max))
-                    is_changed = True
+                    black_p_average = black_p_total_value / black_p_count
+                    #img_rgb.putpixel((x, y), (r_max, g_max, b_max))
+                    img_new.putpixel((x, y), (black_p_average, black_p_average, black_p_average))
                 else:
+                    # 周りに黒がない場合
+                    # 周りがすべて赤なら赤のままにしておく
                     if c_l == 2 and c_r == 2 and c_a == 2 and c_b ==2:
-                        img_rgb.putpixel((x, y), (r, g, b))
+                        img_new.putpixel((x, y), (r, g, b))
                     else:
-                        img_rgb.putpixel((x, y), (255, 255, 255))
-                        is_changed = True
+                        # 黒がない and すべて赤でない
+                        # 白に変換
+                        img_new.putpixel((x, y), (255, 255, 255))
 
                 print "({}, {}), ({}, {}, {})".format(x, y, r, g, b)
                 #img_rgb.putpixel((x, y), (255, 255, 255))
             else:
-                img_rgb.putpixel((x, y), (r, g, b))
+                img_new.putpixel((x, y), (r, g, b))
+    img_new.show()
 
-img_rgb.show()
-img_rgb.save("removed.jpg")
+img_new.show()
+img_new.save("removed.jpg")
