@@ -1,5 +1,6 @@
 # -*- coding: utf8 -*-
 from PIL import Image
+import os.path
 
 BLACK_THRESHOLD = 100
 
@@ -14,8 +15,10 @@ def is_red(r, g, b):
     else:
         return False
 
-
-img = Image.open("JCSreceipt.jpg")
+filename = "2014GWWS.jpg"
+filename_body, filename_ext = os.path.splitext(filename)
+remove_filename = "{}_removed{}".format(filename_body, filename_ext)
+img = Image.open(filename)
 img_new = img.copy()
 img_gray_data = img.convert('L').getdata()
 #img_gray.show()
@@ -108,4 +111,4 @@ while(is_changed):
                 img_new.putpixel((x, y), (r, g, b))
 
 img_new.show()
-img_new.save("removed.jpg")
+img_new.save(remove_filename)
