@@ -1,6 +1,7 @@
 # -*- coding: utf8 -*-
 from PIL import Image
 import os.path
+import sys
 
 BLACK_THRESHOLD = 100
 
@@ -15,7 +16,7 @@ def is_red(r, g, b):
     else:
         return False
 
-filename = "JCSreceipt.jpg"
+filename = sys.argv[1]
 filename_body, filename_ext = os.path.splitext(filename)
 remove_filename = "{}_removed{}".format(filename_body, filename_ext)
 img = Image.open(filename)
