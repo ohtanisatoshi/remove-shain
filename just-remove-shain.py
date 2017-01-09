@@ -1,12 +1,14 @@
 # -*- coding: utf8 -*-
 from PIL import Image
+import numpy as np
 
 BLACK_THRESHOLD = 130
+RED_THRESHOLD = 255 * 0.5
 
 def is_red(r, g, b):
     r_g = r - g
     r_b = r - b
-    if r_g >= 0 and r_b >= 0:
+    if r > RED_THRESHOLD and r_g >= 0 and r_b >= 0:
         if r_g > 5 or r_b > 5:
             return True
         else:
@@ -15,7 +17,20 @@ def is_red(r, g, b):
         return False
 
 
-img = Image.open("Jobwise.jpg")
+def is_red2(r, g, b):
+    m = float((r + g + b)) / 3
+    v = ((r - m)**2 + (g - m)**2 + (b - m)**2) / 3
+    sd = np.sqrt(v)
+    r_s = (r - m) / sd
+    g_s = (g - m) / sd
+    b_s = (b - m) / sd
+    if r_s > 1.35 and (g_s < 0.0 or b_s < 0.0):
+        return True
+    else:
+        return False
+
+
+img = Image.open("2014GWWS.jpg")
 img_rgb = img.convert('RGB')
 img_gray = img.convert('L')
 #img_gray.show()
@@ -28,10 +43,17 @@ for y in range(h):
         r, g, b = img_rgb.getpixel((x, y))
         if is_red(r, g, b):
             img_rgb.putpixel((x, y), (255, 255, 255))
-            print "({}, {}), ({}, {}, {})".format(x, y, r, g, b)
+            #m = float((r + g + b)) / 3
+            #v = ((r - m)**2 + (g - m)**2 + (b - m)**2) / 3
+            #sd = np.sqrt(v)
+            #r_s = (r - m) / sd
+            #g_s = (g - m) / sd
+            #b_s = (b - m) / sd
+            #print "**({}, {}), ({}, {}, {}), ({:.2f}, {:.2f}, {:.2f})".format(x, y, r, g, b, r_s, g_s, b_s)
             #img_rgb.putpixel((x, y), (255, 255, 255))
         else:
             img_rgb.putpixel((x, y), (r, g, b))
+            #img_rgb.putpixel((x, y), (255, 255, 255))
 
 img_rgb.show()
 img_rgb.save("just-removed.jpg")

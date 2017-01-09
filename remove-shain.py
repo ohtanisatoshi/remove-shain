@@ -3,11 +3,12 @@ from PIL import Image
 import os.path
 
 BLACK_THRESHOLD = 100
+RED_THRESHOLD = 255 * 0.5
 
 def is_red(r, g, b):
     r_g = r - g
     r_b = r - b
-    if r_g >= 0 and r_b >= 0:
+    if r > RED_THRESHOLD and r_g >= 0 and r_b >= 0:
         if r_g > 5 or r_b > 5:
             return True
         else:
