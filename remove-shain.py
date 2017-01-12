@@ -3,7 +3,7 @@ from PIL import Image
 import os.path
 import sys
 
-BLACK_THRESHOLD = 100
+BLACK_THRESHOLD = 80
 
 def is_red(r, g, b):
     r_g = r - g
@@ -44,6 +44,8 @@ while(is_changed):
                 p_a_r, p_a_g, p_a_b = img_data[(x) + (y-1)*w]
                 p_b_r, p_b_g, p_b_b = img_data[(x)  + (y+1)*w]
                 # 1: white, 2: red, 3: black
+                # 周りが黒かどうかの判定は２ピクセルみる
+                # ２ピクセル連続黒の場合に周りに黒があると判定する
                 gray_l_1 = 0
                 gray_l_2 = 0
                 c_l = 1

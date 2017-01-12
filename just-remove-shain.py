@@ -1,12 +1,14 @@
 # -*- coding: utf8 -*-
 from PIL import Image
+import sys
+import os
 
 BLACK_THRESHOLD = 130
 
 def is_red(r, g, b):
     r_g = r - g
     r_b = r - b
-    if r_g >= 0 and r_b >= 0:
+    if r > 255 * 0.5 and r_g >= 0 and r_b >= 0:
         if r_g > 5 or r_b > 5:
             return True
         else:
@@ -14,8 +16,10 @@ def is_red(r, g, b):
     else:
         return False
 
-
-img = Image.open("Jobwise.jpg")
+filename = sys.argv[1]
+filename_body, filename_ext = os.path.splitext(filename)
+remove_filename = "{}_just_removed{}".format(filename_body, filename_ext)
+img = Image.open(filename)
 img_rgb = img.convert('RGB')
 img_gray = img.convert('L')
 #img_gray.show()
@@ -34,4 +38,4 @@ for y in range(h):
             img_rgb.putpixel((x, y), (r, g, b))
 
 img_rgb.show()
-img_rgb.save("just-removed.jpg")
+img_rgb.save(remove_filename)
